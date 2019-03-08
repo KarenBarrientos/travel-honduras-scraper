@@ -65,7 +65,7 @@ router.get('/', function (req, res, next) {
                 }));
 
               result.forEach(lugar => {
-                db.ref(`/atractivos/${snap.key}/`).push(lugar);
+                db.ref(`/atractivos/${snap.key}/fotos/`).push(lugar);
               });
 
               console.log(result);
