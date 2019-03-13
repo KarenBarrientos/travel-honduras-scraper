@@ -36,7 +36,6 @@ router.get('/', function (req, res, next) {
           url: child.attribs.href 
         }));
 
-      console.log(atractivos);
       atractivos.forEach(atractivo => {
         db.ref('/atractivos/').push(atractivo).then((snap) => {
           request(atractivo.url, function (err, res, html) {
@@ -47,7 +46,17 @@ router.get('/', function (req, res, next) {
             const $ = cheerio.load(html);
             $('.carousel-inner').filter(function () {
               const idata = $(this);
-          
+
+              let descripcion = idata['0']
+                .parent
+                .next
+                .next
+                .children[1]
+                .children[1]
+                .data;
+
+              descripcion = descripcion.substring(3, descripcion.length).trim();
+
               const lugares = [];
           
               idata['0']
@@ -65,10 +74,11 @@ router.get('/', function (req, res, next) {
                 }));
 
               result.forEach(lugar => {
-                db.ref(`/atractivos/${snap.key}/fotos/`).push(lugar);
-              });
-
-              console.log(result);
+                db.ref(`/atractivos/${snap.key}/lugares/${lugar.lugar}/fotos`)
+                  .push(lugar.src);
+                db.ref(`/atractivos/${snap.key}/lugares/${lugar.lugar}/`)
+                  .update({ desc: descripcion });
+                });
               });
           });
         });
